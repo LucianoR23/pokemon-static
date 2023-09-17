@@ -1,10 +1,12 @@
-import { Layout } from "@/components"
+import { useState, useEffect } from 'react';
 import { GetStaticProps, NextPage, GetStaticPaths } from "next";
+import Image from "next/image";
+import { Card, CardActionArea, CardContent, CardMedia, Grid, ToggleButton, Typography } from "@mui/material";
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import { Layout } from "@/components"
 import { pokeApi } from "@/api";
 import { PokemonFull } from "@/interfaces";
-import { Avatar, Card, CardActionArea, CardContent, CardHeader, CardMedia, Grid, IconButton, Typography } from "@mui/material";
-import Image from "next/image";
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import { localFavorites } from "@/utils";
 
 interface Props {
     pokemon: PokemonFull
@@ -13,6 +15,18 @@ interface Props {
 const PokemonPage: NextPage<Props> = ({ pokemon }) => {
 
     const nameCapitalized = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)
+
+    const [isFav, setIsFav] = useState( false )
+
+    const onToggleFavorite = () => {
+        localFavorites.toggleFavorite( pokemon.id )
+        setIsFav( !isFav )
+    }
+
+    useEffect(() => {
+        setIsFav(localFavorites.existInFav(pokemon.id))
+    }, [pokemon.id])
+    
 
     return (
         <Layout title={`#${ pokemon.id } - ${ nameCapitalized }`}>
@@ -29,14 +43,17 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
                     <Card>
                         <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Typography variant="h3">{nameCapitalized}</Typography>
-                            <IconButton>
+                            <ToggleButton selected={ isFav } color="error" value='check' onChange={ onToggleFavorite } >
                                 <FavoriteIcon fontSize="large" />
-                            </IconButton>
+                            </ToggleButton>
 
                         </CardContent>
                         <CardContent sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Typography variant="h6">Sprites:</Typography>
-                            
+                            <Typography variant="h5">Sprites:</Typography>
+                            <Image src={ pokemon.sprites.front_default } alt={ pokemon.name } width={ 80 } height={ 80 } />
+                            <Image src={ pokemon.sprites.back_default } alt={ pokemon.name } width={ 80 } height={ 80 } />
+                            <Image src={ pokemon.sprites.front_shiny } alt={ pokemon.name } width={ 80 } height={ 80 } />
+                            <Image src={ pokemon.sprites.back_shiny } alt={ pokemon.name } width={ 80 } height={ 80 } />
                         </CardContent>
                     </Card>
                 </Grid>
@@ -47,9 +64,7 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
 
 
 export const getStaticPaths: GetStaticPaths = async (ctx) => {
-    // const { data } = await  
     const pokemons108 = [...Array(108)].map( ( value, index ) => `${ index + 387}` )
-    console.log(pokemons108)
 
     return {
         paths: pokemons108.map( id => ({
