@@ -18,7 +18,7 @@ export const FavCardPokemons = ({ pokeId }: Props) => {
             <Card sx={{ borderRadius: 3, width: 200, height: 200 }}>
                 <CardActionArea onClick={ onCLick } sx={{ padding: 3 }}>
                     <CardMedia sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <Image src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${ pokeId }.svg`} alt="" width={ 150 } height={ 150 } />
+                        <Image src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${ pokeId }.png`} alt="" width={ 150 } height={ 150 } />
                     </CardMedia>
                 </CardActionArea>
             </Card>

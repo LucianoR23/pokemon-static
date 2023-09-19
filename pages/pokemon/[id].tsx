@@ -7,6 +7,7 @@ import confetti from 'canvas-confetti'
 import { Layout } from "@/components"
 import { PokemonFull } from "@/interfaces";
 import { getPokemonInfo, localFavorites } from "@/utils";
+import { redirect } from 'next/dist/server/api-utils';
 
 interface Props {
     pokemon: PokemonFull
@@ -58,7 +59,7 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
                 <Grid item xs={ 12 } sm={ 4 }>
                     <CardActionArea onClick={ handleOpen } sx={{ p: '30px' }}>
                         <CardMedia sx={{ display: 'flex', justifyContent: 'center'}}>
-                            <Image alt={ pokemon.name } src={ pokemon.sprites.other?.dream_world.front_default || '/no-image.png' } width={150} height={150}  />
+                            <Image alt={ pokemon.name } src={ pokemon.sprites.other?.['official-artwork'].front_shiny || pokemon.sprites.other?.dream_world.front_default || '/no-image.png' } width={ 300 } height={ 300 }  />
                         </CardMedia>
                     </CardActionArea>
                     <Modal
@@ -68,7 +69,7 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
                         aria-describedby="modal-modal-description"
                     >
                         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: { xs: 300, sm: 600, md: 700 }, bgcolor: 'transparent', boxShadow: 24, p: 4, }}>
-                            <CardMedia sx={{ width: { xs: 250, sm: 500, md: 600 } }} component='img' alt={ pokemon.name } src={ pokemon.sprites.other?.dream_world.front_default || '/no-image.png' } />
+                            <CardMedia sx={{ width: { xs: 250, sm: 500, md: 600 } }} component='img' alt={ pokemon.name } src={ pokemon.sprites.other?.['official-artwork'].front_default || pokemon.sprites.other?.dream_world.front_default || '/no-image.png' } />
                         </Box>
                     </Modal>
                 </Grid>
@@ -98,10 +99,10 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
                         </CardContent>
                         <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <Typography variant="h5">Sprites:</Typography>
-                            <Image src={ pokemon.sprites.versions?.['generation-v']['black-white'].animated?.front_default || pokemon.sprites.front_default } alt={ pokemon.name } width={ 40 } height={ 40 } />
-                            <Image src={ pokemon.sprites.versions?.['generation-v']['black-white'].animated?.back_default || pokemon.sprites.back_default } alt={ pokemon.name } width={ 40 } height={ 40 } />
-                            <Image src={ pokemon.sprites.versions?.['generation-v']['black-white'].animated?.front_shiny || pokemon.sprites.front_shiny } alt={ pokemon.name } width={ 40 } height={ 40 } />
-                            <Image src={ pokemon.sprites.versions?.['generation-v']['black-white'].animated?.back_shiny || pokemon.sprites.back_shiny } alt={ pokemon.name } width={ 40 } height={ 40 } />
+                            <Image src={ pokemon.sprites.versions?.['generation-v']['black-white'].animated?.front_default || pokemon.sprites.front_default || pokemon.sprites.other?.['official-artwork'].front_default || '/noimage.png' } alt={ pokemon.name } width={ 40 } height={ 40 } />
+                            <Image src={ pokemon.sprites.versions?.['generation-v']['black-white'].animated?.back_default || pokemon.sprites.back_default || pokemon.sprites.other?.['official-artwork'].front_shiny || '/noimage.png' } alt={ pokemon.name } width={ 40 } height={ 40 } />
+                            <Image src={ pokemon.sprites.versions?.['generation-v']['black-white'].animated?.front_shiny || pokemon.sprites.front_shiny || pokemon.sprites.other?.['official-artwork'].front_default || '/noimage.png' } alt={ pokemon.name } width={ 40 } height={ 40 } />
+                            <Image src={ pokemon.sprites.versions?.['generation-v']['black-white'].animated?.back_shiny || pokemon.sprites.back_shiny || pokemon.sprites.other?.['official-artwork'].front_shiny || '/noimage.png' } alt={ pokemon.name } width={ 40 } height={ 40 } />
                         </CardContent>
                     </Card>
 
@@ -119,7 +120,8 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
         paths: pokemons108.map( id => ({
             params: { id }
         })),
-        fallback: false
+        // fallback: false
+        fallback: 'blocking'
     }
 }
 
@@ -128,10 +130,22 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
     const { id } = params as { id: string }
 
+    const pokemon = await getPokemonInfo( id )
+
+    if( !pokemon ) {
+        return {
+            redirect: {
+                destination: '/',
+                permanent: false
+            }
+        }
+    }
+
     return {
         props: {
-            pokemon: await getPokemonInfo( id )
-            }
+            pokemon
+            },
+        revalidate: 86400,
         }
 }
 
