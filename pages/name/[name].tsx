@@ -58,7 +58,7 @@ const PokemonByNamePage: NextPage<Props> = ({ pokemon }) => {
                 <Grid item xs={ 12 } sm={ 4 }>
                     <CardActionArea onClick={ handleOpen } sx={{ p: '30px' }}>
                         <CardMedia sx={{ display: 'flex', justifyContent: 'center'}}>
-                            <Image alt={ pokemon.name } src={ pokemon.sprites.other?.dream_world.front_default || '/no-image.png' } width={150} height={150}  />
+                            <Image alt={ pokemon.name } src={ pokemon.sprites.other?.dream_world.front_default || '/no-image.png' } width={300} height={300}  />
                         </CardMedia>
                     </CardActionArea>
                     <Modal
