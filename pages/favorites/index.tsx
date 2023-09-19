@@ -1,5 +1,5 @@
-import { Layout, NoFav } from "@/components"
 import { useState, useEffect } from 'react';
+import { Layout, NoFav, FavoritesPokemons } from "@/components"
 import { localFavorites } from '@/utils';
 
 
@@ -16,7 +16,13 @@ const Favorites = () => {
     return (
         <Layout title="Favorites Pokemons">
 
-            <NoFav />
+            {
+                favPokemons.length === 0
+                ? (<NoFav />)
+                : (
+                    <FavoritesPokemons favPokemons={ favPokemons } />
+                )
+            }
 
         </Layout>
     )

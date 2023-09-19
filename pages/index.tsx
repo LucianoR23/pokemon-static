@@ -31,8 +31,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
   const { data } = await pokeApi.get<PokemonListResponse>('/pokemon?offset=386&limit=108')
 
   const pokemons: Pokemon[] = data.results.map( ( poke, index ) => {
-    const nameCapitalized = poke.name.charAt(0).toUpperCase() + poke.name.slice(1)
-    return { ...poke, name: nameCapitalized, id: index + 387, img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${index + 387}.svg` }
+    return { ...poke, id: index + 387, img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${index + 387}.svg` }
   } )
 
   return {

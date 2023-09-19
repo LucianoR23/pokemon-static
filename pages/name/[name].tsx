@@ -1,24 +1,24 @@
 import { useState, useEffect } from 'react';
 import { GetStaticProps, NextPage, GetStaticPaths } from "next";
 import Image from "next/image";
+import confetti from 'canvas-confetti'
 import { Box, Card, CardActionArea, CardContent, CardMedia, Grid, Modal, ToggleButton, Typography } from "@mui/material";
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
-import confetti from 'canvas-confetti'
 import { Layout } from "@/components"
-import { PokemonFull } from "@/interfaces";
+import { pokeApi } from "@/api";
+import { PokemonFull, PokemonListResponse } from "@/interfaces";
 import { getPokemonInfo, localFavorites } from "@/utils";
 
 interface Props {
     pokemon: PokemonFull
 }
 
-const PokemonPage: NextPage<Props> = ({ pokemon }) => {
+const PokemonByNamePage: NextPage<Props> = ({ pokemon }) => {
+
 
     const nameCapitalized = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)
     const typesCapitalized = pokemon.types.map( t => t.type.name.charAt(0).toUpperCase() + t.type.name.slice(1) )
     const abilitiesCapitalized = pokemon.abilities.map( t => t.ability.name.charAt(0).toUpperCase() + t.ability.name.slice(1) )
-    
-    
 
     const [isFav, setIsFav] = useState( false )
 
@@ -81,7 +81,6 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
                                 <StarRoundedIcon fontSize="large" />
                             </ToggleButton>
                         </CardContent>
-
                         <CardContent sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
                             <Typography variant="h5">Type:</Typography>
                             <Typography variant="h5">&nbsp;{ typesCapitalized[0] }&nbsp;</Typography>
@@ -113,11 +112,13 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
 
 
 export const getStaticPaths: GetStaticPaths = async (ctx) => {
-    const pokemons108 = [...Array(108)].map( ( value, index ) => `${ index + 387}` )
+    const { data } = await pokeApi.get<PokemonListResponse>('/pokemon?offset=386&limit=108')
+    
+    const pokemons108: string[] = data.results.map( ( pokemon ) => pokemon.name )
 
     return {
-        paths: pokemons108.map( id => ({
-            params: { id }
+        paths: pokemons108.map( name => ({
+            params: { name }
         })),
         fallback: false
     }
@@ -126,15 +127,15 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
 
-    const { id } = params as { id: string }
+    const { name } = params as { name: string }
 
     return {
         props: {
-            pokemon: await getPokemonInfo( id )
+            pokemon: await getPokemonInfo( name )
             }
         }
 }
 
 
 
-export default PokemonPage;
+export default PokemonByNamePage;

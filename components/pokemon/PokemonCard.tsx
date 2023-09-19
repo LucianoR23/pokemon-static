@@ -12,21 +12,23 @@ interface Props {
 export const PokemonCard: FC<Props> = ({ pokemon: { id, img, name } }) => {
     const router = useRouter()
 
+    const nameCapitalized = name.charAt(0).toUpperCase() + name.slice(1)
+
     const onCLick = () => {
-        router.push(`/pokemon/${ id }`)
+        router.push(`/name/${ name }`)
     }
 
 
     return (
-            <Card sx={{ borderRadius: 3, width: 200, height: 200 }}>
-                <CardActionArea onClick={ onCLick }>
-                <CardMedia sx={{ display: 'flex', justifyContent: 'center'}}>
-                    <Image alt={name} src={img} width={150} height={150}  />
-                </CardMedia>
-                <CardContent sx={{ p: 1, display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography>{ name }</Typography>
-                    <Typography>#{ id }</Typography>
-                </CardContent>
+            <Card sx={{ borderRadius: 3 }}>
+                <CardActionArea onClick={ onCLick } sx={{ width: 200, height: 200 }}>
+                    <CardMedia sx={{ display: 'flex', justifyContent: 'center'}}>
+                        <Image alt={name} src={img} width={150} height={150}  />
+                    </CardMedia>
+                    <CardContent sx={{ p: 1, display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography>{ nameCapitalized }</Typography>
+                        <Typography>#{ id }</Typography>
+                    </CardContent>
                 </CardActionArea>
             </Card>
     )

@@ -4,11 +4,6 @@ import { lightTheme } from '../lightTheme';
 import { darkTheme } from '../darkTheme';
 
 
-// type ThemeContextType = {
-//   theme: Theme;
-//   toggleTheme: () => void;
-// };
-
 export const ThemeContext = createContext({
   theme: darkTheme,
   toggleTheme: () => {},
